@@ -1,0 +1,66 @@
+#ifndef __TYPES_INCLUDED__
+#define __TYPES_INCLUDED__
+
+#define PI					3.14159265359
+
+#define FLT_MIN				1e-3
+#define FLT_MAX				1e16
+#define SAMPLES_PER_PIXEL	16
+#define MAX_DEPTH			 8
+
+////////////////////////////////////////////////////////////////////////////////////
+
+struct Material
+{
+	int Type;
+	float3 Albedo;
+	float Fuzz;
+	float IR;
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+
+struct Camera {
+	float3 Origin;
+	float3 LowerLeftCorner;
+	float3 Horizontal;
+	float3 Vertical;
+	float3 u, v, w;
+	float LensRadius;
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+
+struct Ray {
+	float3 Origin;
+	float3 Dir;
+	// float3 invDir; 
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+struct Sphere {
+	float3 Center;
+	float Radius;
+	Material Mat;
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+struct HittableList
+{
+	Sphere Objects[32];
+	// StructuredBuffer<SphereData> objects;
+	int NumObjects;
+};
+
+////////////////////////////////////////////////////////////////////////////////////
+
+struct HitRecord
+{
+	float3 P;
+	float3 Normal;
+	float t;
+	bool bFrontFace;
+	Material Mat;
+};
+
+#endif // __TYPES_INCLUDED__
