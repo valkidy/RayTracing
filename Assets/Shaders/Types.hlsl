@@ -4,10 +4,10 @@
 #define PI						3.14159265359
 
 #define FLT_MIN					1e-3
-#define FLT_MAX					1e16
+#define FLT_MAX					1e12
 #define EPSILON					1e-8
-#define SAMPLES_PER_PIXEL		24
-#define MAX_DEPTH				16
+#define SAMPLES_PER_PIXEL		16
+#define MAX_DEPTH				8
 
 #define MAT_LAMBERTIAN			0
 #define MAT_METAL				1
@@ -39,7 +39,6 @@ struct Camera {
 struct Ray {
 	float3 Origin;
 	float3 Dir;
-	// float3 invDir; 
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -52,8 +51,8 @@ struct Sphere {
 ////////////////////////////////////////////////////////////////////////////////////
 struct HittableList
 {
-	Sphere Objects[32];
-	// StructuredBuffer<SphereData> objects;
+	// Sphere Objects[32];
+	StructuredBuffer<Sphere> Objects;
 	int NumObjects;
 };
 

@@ -33,7 +33,7 @@ bool Sphere_Hit(in Sphere s, in Ray r, float t_min, float t_max, inout HitRecord
 			return false;
 	}
 
-	rec = _HitRecord(r, s, root);
+	rec = _HitRecord(r, s, root);	
 
 	return true;
 }

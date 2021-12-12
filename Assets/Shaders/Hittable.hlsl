@@ -5,9 +5,17 @@
 #include "Ray.hlsl"
 #include "Sphere.hlsl"
 
+HittableList _HittableList(StructuredBuffer<Sphere> objects, int num_objects)
+{
+	HittableList world;
+	world.Objects = objects;
+	world.NumObjects = num_objects;
 
-bool HittableList_Hit(in HittableList hittables, in Ray r, float t_min, float t_max, inout HitRecord rec) {
+	return world;
+}
 
+bool HittableList_Hit(in HittableList hittables, in Ray r, float t_min, float t_max, inout HitRecord rec) 
+{
 	HitRecord TempRec = (HitRecord)0;
 	bool bHitAnything = false;
 	float ClosestSoFar = t_max;

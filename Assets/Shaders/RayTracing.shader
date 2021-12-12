@@ -17,13 +17,7 @@
 			#pragma fragment frag
 
 			#include "VertImg.hlsl"
-			#include "Types.hlsl"
-			#include "Common.hlsl"
-			#include "Ray.hlsl"
-			#include "Material.hlsl"
-			#include "Camera.hlsl"
-			#include "Sphere.hlsl"
-			#include "Hittable.hlsl"
+			#include "RayTracing.hlsl"
 
 			#define ENABLE_GAMMA_CORRECTION	 1
 			#define DIFFUSE 1
@@ -40,11 +34,12 @@
 								
 				for (int i = 0; i < MAX_DEPTH; i++)
 				{
+					
 					if (HittableList_Hit(world, R, FLT_MIN, FLT_MAX, rec))
 					{
 						float Offset = 2.0 * (((float)i) / (float)(MAX_DEPTH)-0.5);
 						float3 seed = float3(uv, Offset);
-#if DIFFUSE
+#if DIFFUSE						
 						if (Material_Scatter(rec.Mat, R, rec, Attenuation, Scattered, seed))
 						{
 							R = Scattered;
@@ -69,12 +64,17 @@
 				}
 				return (float3)0;
 			}			
+			
+			StructuredBuffer<Sphere> _SphereData;
+			int _NumSpheres;
 
 			half4 frag(v2f i) : SV_Target
 			{
 				// Image
 				float aspect_ratio = 16.0 / 9.0;
-
+#if 1
+				HittableList world = _HittableList(_SphereData, _NumSpheres);
+#else
 				HittableList world = (HittableList)0;
 				Material material_ground = _Lambertian(float3(0.8, 0.8, 0.0));
 				Material material_center = _Lambertian(float3(0.1, 0.2, 0.3));
@@ -87,15 +87,17 @@
 				world.Objects[3] = _Sphere(float3(-1.0, 0.0, -1.0), -0.4, material_left);
 				world.Objects[4] = _Sphere(float3(1.0, 0.0, -1.0), 0.5, material_right);
 				world.NumObjects = 5;
-
-				float3 lookfrom = float3(3, 3, 2);
-				float3 lookat = float3(0, 0, -1);
-				float dist_to_focus = length(lookfrom - lookat);
-				float aperture = 2.0;
-
+#endif
+				float3 lookfrom = float3(13, 2, 3);
+				float3 lookat = float3(0, 0, 0);
+				float3 vup = float3(0, 1, 0);
+				float dist_to_focus = 10.0;// length(lookfrom - lookat);
+				float aperture = 0.1; // 2.0;
+			
+				
 				// Camera
 				// Camera cam = _Camera();
-				Camera cam = _Camera(float3(3, 3, 2), float3(0, 0, -1), float3(0, 1, 0), 30, aspect_ratio, aperture, dist_to_focus);
+				Camera cam = _Camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
 				float3 color = (float3)0;
 

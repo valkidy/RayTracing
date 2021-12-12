@@ -1,16 +1,16 @@
 #ifndef __MATERIAL_INCLUDED__
 #define __MATERIAL_INCLUDED__
 
-Material _Material(int type, float3 albedo, float fuzz)
-{
-	Material m;
-	m.Type = type;
-	m.Albedo = albedo;
-	m.Fuzz = (fuzz < 1) ? fuzz : 1.0;
-	m.IR = fuzz;
-
-	return m;
-}
+//Material _Material(int type, float3 albedo, float fuzz)
+//{
+//	Material m = (Material)0;
+//	m.Type = type;
+//	m.Albedo = albedo;
+//	m.Fuzz = (fuzz < 1) ? fuzz : 1.0;
+//	m.IR = fuzz;
+//
+//	return m;
+//}
 
 Material _Lambertian(float3 albedo)
 {
@@ -83,15 +83,15 @@ bool Material_Scatter(in Material m, in Ray r, in HitRecord rec, inout float3 at
 	{
 		return Lambertian_Scatter(m, r, rec, attenuation, scattered, seed);
 	}
-	if (MAT_METAL == m.Type)
+	else if (MAT_METAL == m.Type)
 	{
 		return Metal_Scatter(m, r, rec, attenuation, scattered, seed);
 	}
-	if (MAT_DIELECTRIC == m.Type)
+	else if (MAT_DIELECTRIC == m.Type)
 	{
 		return Dielectric_Scatter(m, r, rec, attenuation, scattered, seed);
 	}
-	return true;
+	return false;
 }
 
 
