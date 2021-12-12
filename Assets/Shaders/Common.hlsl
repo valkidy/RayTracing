@@ -30,8 +30,8 @@ float3 RandomUnitVector(uint seed)
 float3 RandomInUnitSphere(float3 seed)
 {
 	float2 Rand = float2(Random(seed.xy), Random(seed.xy + seed.z));
-	Rand -= 0.5f;
-	Rand *= 2.0f;
+	Rand = 2.0 * (Rand - 0.5); // [0..1] -> [-1..1]
+	
 	float ang1 = (Rand.x + 1.0) * PI; // [-1..1) -> [0..2*PI)
 	float u = Rand.y; // [-1..1), cos and acos(2v-1) cancel each other out, so we arrive at [-1..1)
 	float u2 = u * u;
@@ -42,6 +42,12 @@ float3 RandomInUnitSphere(float3 seed)
 	return float3(x, y, z);
 }
 
+float3 RandomInUnitDisk(float3 seed)
+{
+	float2 Rand = float2(Random(seed.xy), Random(seed.xy + seed.z));
+	Rand = 2.0 * (Rand - 0.5); // [0..1] -> [-1..1]
+	return float3(normalize(Rand), 0.0);
+}
 ////////////////////////////////////////////////////////////////////////////////////
 
 bool NearZero(float3 v)

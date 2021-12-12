@@ -88,9 +88,14 @@
 				world.Objects[4] = _Sphere(float3(1.0, 0.0, -1.0), 0.5, material_right);
 				world.NumObjects = 5;
 
+				float3 lookfrom = float3(3, 3, 2);
+				float3 lookat = float3(0, 0, -1);
+				float dist_to_focus = length(lookfrom - lookat);
+				float aperture = 2.0;
+
 				// Camera
 				// Camera cam = _Camera();
-				Camera cam = _Camera(float3(-2, 2, 1), float3(0, 0, -1), float3(0, 1, 0), 30, aspect_ratio, 1.0, 1.0);
+				Camera cam = _Camera(float3(3, 3, 2), float3(0, 0, -1), float3(0, 1, 0), 30, aspect_ratio, aperture, dist_to_focus);
 
 				float3 color = (float3)0;
 
