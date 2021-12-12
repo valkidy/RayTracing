@@ -42,4 +42,34 @@ float3 RandomInUnitSphere(float3 seed)
 	return float3(x, y, z);
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+
+bool NearZero(float3 v)
+{
+	const float s = EPSILON;
+	return (abs(v.x) < s) && (abs(v.y) < s) && (abs(v.z) < s);
+}
+
+float3 Reflect(float3 v, float3 n)
+{
+	return v - 2 * dot(v, n)*n;
+}
+
+float3 Refract(float3 uv, float3 n, float etai_over_etat)
+{
+	float cos_theta = min(dot(-uv, n), 1.0);
+	float3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
+	float3 r_out_parallel = -sqrt(abs(1.0 - dot(r_out_perp, r_out_perp))) * n;
+	return r_out_perp + r_out_parallel;
+}
+
+float Reflectance(float cosine, float ref_idx)
+{
+	// Use Schlick's approximation for reflectance.
+	float r0 = (1 - ref_idx) / (1 + ref_idx);
+	r0 = r0 * r0;
+	return r0 + (1 - r0) * pow((1 - cosine), 5);
+}
+
+
 #endif // __UTILITY_INCLUDED__

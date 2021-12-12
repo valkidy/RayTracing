@@ -1,12 +1,17 @@
 #ifndef __TYPES_INCLUDED__
 #define __TYPES_INCLUDED__
 
-#define PI					3.14159265359
+#define PI						3.14159265359
 
-#define FLT_MIN				1e-3
-#define FLT_MAX				1e16
-#define SAMPLES_PER_PIXEL	16
-#define MAX_DEPTH			 8
+#define FLT_MIN					1e-3
+#define FLT_MAX					1e16
+#define EPSILON					1e-8
+#define SAMPLES_PER_PIXEL		24
+#define MAX_DEPTH				16
+
+#define MAT_LAMBERTIAN			0
+#define MAT_METAL				1
+#define MAT_DIELECTRIC			2 
 
 ////////////////////////////////////////////////////////////////////////////////////
 

@@ -16,9 +16,13 @@ Camera _Camera()
 	return cam;
 }
 
-Camera _Camera(float3 look_from, float3 look_at, float3 vup,
-	float vfov, float aspect_ratio,
-	float aperture, float focus_dist)
+Camera _Camera(float3 look_from, 
+			   float3 look_at, 
+			   float3 vup,
+			   float vfov, 
+	           float aspect_ratio,
+			   float aperture, 
+	           float focus_dist)
 {
 	Camera Cam;
 
