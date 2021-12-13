@@ -7,31 +7,38 @@ using World = RayTracing.World;
 
 public class RayTracingGPU : MonoBehaviour
 {
-    [SerializeField] Shader shader;
+    [SerializeField] Shader shader = default;
+    [SerializeField] [Range(0f, 0.3f)] float aperture = 0.1f;
+    [SerializeField] [Range(1e-3f, 20f)] float focusDist = 10f;
+    float aspectRatio = 16f / 9f;
 
     Material material;
-    ComputeBuffer dataBuffer;
-    ComputeBuffer cameraBuffer;
+    ComputeBuffer StructureSphereDataBuffer;
+    ComputeBuffer StructureCameraDataBuffer;
     RenderTexture renderTexture;
-    float aspectRatio = 16f / 9f;
-    int image_width = 400;
-    int image_height = 400 * 9 / 16;
-
+   
     // Start is called before the first frame update
     void Start()
     {
+        int imageWidth = Screen.width; // 400
+        int imageHeight = (int)(imageWidth / aspectRatio);
+
         material = new Material(shader);
-        renderTexture = new RenderTexture(image_width, image_height, 0, RenderTextureFormat.ARGB32);
+        renderTexture = new RenderTexture(imageWidth, imageHeight, 0, RenderTextureFormat.ARGB32);
 
         // Buffer
         (var SphereData, var NumSpheres) = World.RandomScene();
-        
-        dataBuffer = new ComputeBuffer(256, Marshal.SizeOf(typeof(Sphere)));        
-        dataBuffer.SetData(SphereData);
-        cameraBuffer = new ComputeBuffer(1, Marshal.SizeOf(typeof(RayTracing.Camera)));
 
-        material.SetBuffer("_SphereData", dataBuffer);
+        StructureSphereDataBuffer = new ComputeBuffer(256, Marshal.SizeOf(typeof(Sphere)));
+        StructureSphereDataBuffer.SetData(SphereData);
+        StructureCameraDataBuffer = new ComputeBuffer(1, Marshal.SizeOf(typeof(RayTracing.Camera)));
+
+        material.SetBuffer("_SphereData", StructureSphereDataBuffer);
         material.SetInt("_NumSpheres", NumSpheres);
+
+        material.EnableKeyword("ENABLE_GAMMA_CORRECTION");
+        material.EnableKeyword("ENABLE_MATERIAL");
+        material.EnableKeyword("ENABLE_DOF");
     }
 
     void OnDestroy()
@@ -39,24 +46,25 @@ public class RayTracingGPU : MonoBehaviour
         DestroyImmediate(material);
         renderTexture?.Release();
 
-        dataBuffer?.Dispose();
-        dataBuffer = null;
-        cameraBuffer?.Dispose();
-        cameraBuffer = null;
+        StructureSphereDataBuffer?.Dispose();
+        StructureSphereDataBuffer = null;
+        StructureCameraDataBuffer?.Dispose();
+        StructureCameraDataBuffer = null;
     }
 
     void FixedUpdate()
     {
         var c = Camera.main;
-        var Cam = World.Camera(c.transform.position, Vector3.zero, Vector3.up, 20f, aspectRatio, 0.1f, 10f);
-        cameraBuffer.SetData(new RayTracing.Camera[] { Cam });
-        material.SetBuffer("_CameraData", cameraBuffer);
+        var Cam = World.Camera(c.transform.position, Vector3.zero, Vector3.up, 20f, aspectRatio, aperture, focusDist);
+        StructureCameraDataBuffer.SetData(new RayTracing.Camera[] { Cam });
+        material.SetBuffer("_CameraData", StructureCameraDataBuffer);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        Graphics.Blit(source, destination, material);
-        // Graphics.Blit(source, renderTexture, material);
-        // Graphics.Blit(renderTexture, destination);
+        // Graphics.Blit(source, destination, material);
+
+        Graphics.Blit(source, renderTexture, material);
+        Graphics.Blit(renderTexture, destination);
     }
 }

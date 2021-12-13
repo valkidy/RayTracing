@@ -1,7 +1,6 @@
 #ifndef __SPHERE_INCLUDED__
 #define __SPHERE_INCLUDED__
 
-#include "Types.hlsl"
 #include "HitRecord.hlsl"
 
 inline Sphere _Sphere(float3 c, float r, Material m)

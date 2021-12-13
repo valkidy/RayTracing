@@ -13,6 +13,8 @@
 #define MAT_METAL				1
 #define MAT_DIELECTRIC			2 
 
+// feature 
+#define ENABLE_GAMMA_CORRECTION	 1
 ////////////////////////////////////////////////////////////////////////////////////
 
 struct Material

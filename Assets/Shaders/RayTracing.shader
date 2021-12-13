@@ -15,12 +15,12 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
+			#pragma multi_compile __ ENABLE_GAMMA_CORRECTION
+			#pragma multi_compile __ ENABLE_MATERIAL
+			#pragma multi_compile __ ENABLE_DOF
 
 			#include "VertImg.hlsl"
 			#include "RayTracing.hlsl"
-
-			#define ENABLE_GAMMA_CORRECTION	 1
-			#define DIFFUSE 1
 
 			float3 Ray_Color(in Ray r, in HittableList world, in float2 uv) {
 				
@@ -39,7 +39,7 @@
 					{
 						float Offset = 2.0 * (((float)i) / (float)(MAX_DEPTH)-0.5);
 						float3 seed = float3(uv, Offset);
-#if DIFFUSE						
+#if ENABLE_MATERIAL						
 						if (Material_Scatter(rec.Mat, R, rec, Attenuation, Scattered, seed))
 						{
 							R = Scattered;
@@ -65,33 +65,15 @@
 				return (float3)0;
 			}			
 			
-			StructuredBuffer<Sphere> _SphereData;
 			int _NumSpheres;
+			StructuredBuffer<Sphere> _SphereData;			
 			StructuredBuffer<Camera> _CameraData;
 
 			half4 frag(v2f i) : SV_Target
 			{
-				// Image
-				float aspect_ratio = 16.0 / 9.0;
-#if 1
 				HittableList world = _HittableList(_SphereData, _NumSpheres);
-#else
-				HittableList world = (HittableList)0;
-				Material material_ground = _Lambertian(float3(0.8, 0.8, 0.0));
-				Material material_center = _Lambertian(float3(0.1, 0.2, 0.3));
-				Material material_left = _Dielectric(1.5);
-				Material material_right = _Metal(float3(0.8, 0.6, 0.2), 0.0);
 
-				world.Objects[0] = _Sphere(float3(0.0, -100.5, -1.0), 100.0, material_ground);
-				world.Objects[1] = _Sphere(float3(0.0, 0.0, -1.0), 0.5, material_center);
-				world.Objects[2] = _Sphere(float3(-1.0, 0.0, -1.0), 0.5, material_left);
-				world.Objects[3] = _Sphere(float3(-1.0, 0.0, -1.0), -0.4, material_left);
-				world.Objects[4] = _Sphere(float3(1.0, 0.0, -1.0), 0.5, material_right);
-				world.NumObjects = 5;
-#endif
 				// Camera
-				// Camera cam = _Camera();
-				// Camera cam = _Camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 				Camera cam = _CameraData[0];
 
 				float3 color = (float3)0;

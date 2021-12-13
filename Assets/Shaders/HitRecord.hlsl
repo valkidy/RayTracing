@@ -1,8 +1,6 @@
 #ifndef __HITRECORD_INCLUDED__
 #define __HITRECORD_INCLUDED__
 
-#include "Types.hlsl"
-
 void HitRecord_SetFaceNormal(inout HitRecord rec, Ray r, float3 outward_normal)
 {
 	rec.bFrontFace = (dot(r.Dir, outward_normal) < 0);

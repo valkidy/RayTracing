@@ -47,10 +47,9 @@ Camera _Camera(float3 look_from,
 
 Ray Camera_GetRay(in Camera c, float2 uv)
 {
-#if 1
-	float3 rd = c.LensRadius; // * RandomInUnitDisk(float3(uv, 1.0));
+#if ENABLE_DOF
+	float3 rd = c.LensRadius * RandomInUnitDisk(float3(uv, 0.4));
 	float3 offset = c.u * rd.x + c.v * rd.y;
-
 	return _Ray(c.Origin + offset, c.LowerLeftCorner + uv.x * c.Horizontal + uv.y * c.Vertical - c.Origin - offset);
 #else
 	return _Ray(c.Origin, c.LowerLeftCorner + uv.x * c.Horizontal + uv.y * c.Vertical - c.Origin);

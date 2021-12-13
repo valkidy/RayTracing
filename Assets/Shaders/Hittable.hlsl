@@ -1,10 +1,6 @@
 #ifndef __HITTABLE_INCLUDED__
 #define __HITTABLE_INCLUDED__
 
-#include "Types.hlsl"
-#include "Ray.hlsl"
-#include "Sphere.hlsl"
-
 HittableList _HittableList(StructuredBuffer<Sphere> objects, int num_objects)
 {
 	HittableList world;

@@ -1,16 +1,16 @@
 #ifndef __MATERIAL_INCLUDED__
 #define __MATERIAL_INCLUDED__
 
-//Material _Material(int type, float3 albedo, float fuzz)
-//{
-//	Material m = (Material)0;
-//	m.Type = type;
-//	m.Albedo = albedo;
-//	m.Fuzz = (fuzz < 1) ? fuzz : 1.0;
-//	m.IR = fuzz;
-//
-//	return m;
-//}
+Material _Material(int type, float3 albedo, float fuzz)
+{
+	Material m = (Material)0;
+	m.Type = type;
+	m.Albedo = albedo;
+	m.Fuzz = (fuzz < 1) ? fuzz : 1.0;
+	m.IR = fuzz;
+
+	return m;
+}
 
 Material _Lambertian(float3 albedo)
 {
