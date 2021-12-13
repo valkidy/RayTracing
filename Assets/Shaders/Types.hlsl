@@ -6,8 +6,8 @@
 #define FLT_MIN					1e-3
 #define FLT_MAX					1e12
 #define EPSILON					1e-8
-#define SAMPLES_PER_PIXEL		16
-#define MAX_DEPTH				8
+#define SAMPLES_PER_PIXEL		8 //16
+#define MAX_DEPTH				6 //8
 
 #define MAT_LAMBERTIAN			0
 #define MAT_METAL				1

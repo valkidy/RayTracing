@@ -67,6 +67,7 @@
 			
 			StructuredBuffer<Sphere> _SphereData;
 			int _NumSpheres;
+			StructuredBuffer<Camera> _CameraData;
 
 			half4 frag(v2f i) : SV_Target
 			{
@@ -88,16 +89,10 @@
 				world.Objects[4] = _Sphere(float3(1.0, 0.0, -1.0), 0.5, material_right);
 				world.NumObjects = 5;
 #endif
-				float3 lookfrom = float3(13, 2, 3);
-				float3 lookat = float3(0, 0, 0);
-				float3 vup = float3(0, 1, 0);
-				float dist_to_focus = 10.0;// length(lookfrom - lookat);
-				float aperture = 0.1; // 2.0;
-			
-				
 				// Camera
 				// Camera cam = _Camera();
-				Camera cam = _Camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+				// Camera cam = _Camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+				Camera cam = _CameraData[0];
 
 				float3 color = (float3)0;
 

@@ -11,7 +11,9 @@ public class RayTracingGPU : MonoBehaviour
 
     Material material;
     ComputeBuffer dataBuffer;
+    ComputeBuffer cameraBuffer;
     RenderTexture renderTexture;
+    float aspectRatio = 16f / 9f;
     int image_width = 400;
     int image_height = 400 * 9 / 16;
 
@@ -23,11 +25,10 @@ public class RayTracingGPU : MonoBehaviour
 
         // Buffer
         (var SphereData, var NumSpheres) = World.RandomScene();
-
-        Debug.Log(Marshal.SizeOf(typeof(Sphere)));
-
+        
         dataBuffer = new ComputeBuffer(256, Marshal.SizeOf(typeof(Sphere)));        
         dataBuffer.SetData(SphereData);
+        cameraBuffer = new ComputeBuffer(1, Marshal.SizeOf(typeof(RayTracing.Camera)));
 
         material.SetBuffer("_SphereData", dataBuffer);
         material.SetInt("_NumSpheres", NumSpheres);
@@ -40,6 +41,16 @@ public class RayTracingGPU : MonoBehaviour
 
         dataBuffer?.Dispose();
         dataBuffer = null;
+        cameraBuffer?.Dispose();
+        cameraBuffer = null;
+    }
+
+    void FixedUpdate()
+    {
+        var c = Camera.main;
+        var Cam = World.Camera(c.transform.position, Vector3.zero, Vector3.up, 20f, aspectRatio, 0.1f, 10f);
+        cameraBuffer.SetData(new RayTracing.Camera[] { Cam });
+        material.SetBuffer("_CameraData", cameraBuffer);
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)

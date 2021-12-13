@@ -12,25 +12,62 @@ namespace RayTracing
         MAT_DIELECTRIC = 2,
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct Material // 24
+    [StructLayout(LayoutKind.Sequential, Pack = 1 /* 24 bytes */)]
+    public struct Material 
     {
         public int Type;
         public Vector3 Albedo;
         public float Fuzz;
-        public float Ir; // index_of_refraction;
+        public float Ir;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct Sphere // 16 + 24
+    [StructLayout(LayoutKind.Sequential, Pack = 1 /* 16 + 24 = 40 bytes */)]
+    public struct Sphere
     {
         public Vector3 Center;
         public float Radius;
         public Material Mat;
     };
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1 /* 32 bytes */)]
+    public struct Camera
+    {
+        public Vector3 Origin;
+        public Vector3 LowerLeftCorner;
+        public Vector3 Horizontal;
+        public Vector3 Vertical;
+        public Vector3 u, v, w;
+        public float LensRadius;
+    };
+
     public class World
     {
+        public static Camera Camera(Vector3 LookFrom,
+                                    Vector3 LookAt,
+                                    Vector3 Up,
+                                    float Fov,
+                                    float AspectRatio,
+                                    float Aperture,
+                                    float FocusDist)
+        {
+            float Theta = Fov * Mathf.PI / 180.0f;
+            float h = Mathf.Tan(Theta / 2);
+            float ViewportHeight = 2.0f * h;
+            float ViewportWidth = AspectRatio * ViewportHeight;
+
+            Camera Cam = new Camera();
+            Cam.w = (LookFrom - LookAt).normalized;
+            Cam.u = Vector3.Cross(Up, Cam.w);
+            Cam.v = Vector3.Cross(Cam.w, Cam.u);
+            Cam.Origin = LookFrom;
+            Cam.Horizontal = FocusDist * ViewportWidth * Cam.u;
+            Cam.Vertical = FocusDist * ViewportHeight * Cam.v;
+            Cam.LowerLeftCorner = Cam.Origin - Cam.Horizontal / 2 - Cam.Vertical / 2 - FocusDist * Cam.w;
+            Cam.LensRadius = Aperture / 2.0f;
+
+            return Cam;
+        }
+
         public static Material Material(MaterialType Type, Vector3 Albedo, float Fuzz=0f)
         {            
             Material Mat = new Material();
