@@ -262,6 +262,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shader: {fileID: 4800000, guid: 65f81d796a9473a489cb7e0095eedbdb, type: 3}
+  aperture: 0.1
+  focusDist: 10
 --- !u!1 &2039939042
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,75 @@
+﻿#define THREADS 8
+
+#include "RayTracing.hlsl"
+
+
+int _NumSpheres;
+StructuredBuffer<Sphere> _SphereData;
+StructuredBuffer<Camera> _CameraData;
+float4 _MainTex_TexelSize;
+RWTexture2D<float4> _MainTex;
+
+float3 Ray_Color(in Ray r, in HittableList world, in float2 uv) {
+
+	HitRecord rec = (HitRecord)0;
+	Ray R = r;
+	float3 Factor = (float3)1.0;
+
+	// Temp
+	Ray Scattered = (Ray)0;
+	float3 Attenuation = (float3)0;
+
+	for (int i = 0; i < MAX_DEPTH; i++)
+	{
+		if (HittableList_Hit(world, R, FLT_MIN, FLT_MAX, rec))
+		{
+			float Offset = 2.0 * (((float)i) / (float)(MAX_DEPTH)-0.5);
+			float3 seed = float3(uv, Offset);					
+			if (Material_Scatter(rec.Mat, R, rec, Attenuation, Scattered, seed))
+			{
+				R = Scattered;
+				Factor *= Attenuation;
+			}
+			else
+			{
+				return (float3)0;
+			}
+		}
+		else
+		{
+			float3 unit_direction = normalize(r.Dir);
+			float t = 0.5 * (unit_direction.y + 1.0);
+			return Factor * lerp(float3(1.0, 1.0, 1.0), float3(0.5, 0.7, 1.0), t);
+		}
+	}
+	return (float3)0;
+}
+
+#pragma kernel ComputerRayTracing
+[numthreads(THREADS, THREADS, 1)]
+void ComputerRayTracing(uint3 id : SV_DispatchThreadID)
+{    
+	HittableList world = _HittableList(_SphereData, _NumSpheres);
+
+	Camera cam = _CameraData[0];
+
+	float3 color = (float3)0;
+
+	[loop]
+	for (int s = 0; s < SAMPLES_PER_PIXEL; s++)
+	{
+		float2 Seed = id.xy / _MainTex_TexelSize.zw;
+		float Offset = 2.0 * (float(s) / float(SAMPLES_PER_PIXEL) - 0.5);
+		float2 Jitter = float2(Random(Seed), Random(Seed + Offset));
+		float2 UV = Seed + Jitter * _MainTex_TexelSize.xy;
+
+		Ray r = Camera_GetRay(cam, UV);
+		color += Ray_Color(r, world, UV);
+	}
+#if ENABLE_GAMMA_CORRECTION				
+	color = saturate(sqrt(color / float(SAMPLES_PER_PIXEL)));
+#else
+	color /= float(SAMPLES_PER_PIXEL);
+#endif				
+	_MainTex[id.xy] = float4(color, 1.0);
+}

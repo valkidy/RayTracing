@@ -37,7 +37,7 @@ Material _Dielectric(float index_of_refraction)
 	return m;
 }
 ////////////////////////////////////////////////////////////////////////////////////
-bool Lambertian_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
+bool Lambertian_Scatter(in Material m, in Ray r, in HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
 {
 	float3 ScatterDirection = rec.Normal + RandomInUnitSphere(seed);
 	// Catch degenerate scatter direction
@@ -48,7 +48,7 @@ bool Lambertian_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 att
 	return true;
 }
 
-bool Metal_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
+bool Metal_Scatter(in Material m, in Ray r, in HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
 {
 	float3 Reflected = Reflect(normalize(r.Dir), rec.Normal);
 	scattered = _Ray(rec.P, Reflected + (m.Fuzz * RandomInUnitSphere(seed)));
@@ -56,7 +56,7 @@ bool Metal_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 attenuat
 	return (dot(scattered.Dir, rec.Normal) > 0);
 }
 
-bool Dielectric_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
+bool Dielectric_Scatter(in Material m, in Ray r, in HitRecord rec, inout float3 attenuation, inout Ray scattered, float3 seed)
 {
 	attenuation = float3(1.0, 1.0, 1.0);
 	float RefractionRatio = rec.bFrontFace ? (1.0 / m.IR) : m.IR;
@@ -79,19 +79,21 @@ bool Dielectric_Scatter(inout Material m, Ray r, HitRecord rec, inout float3 att
 
 bool Material_Scatter(in Material m, in Ray r, in HitRecord rec, inout float3 attenuation, inout Ray scattered, in float3 seed)
 {
+	bool Ret = false;
+
 	if (MAT_LAMBERTIAN == m.Type)
-	{
-		return Lambertian_Scatter(m, r, rec, attenuation, scattered, seed);
+	{		
+		Ret = Lambertian_Scatter(m, r, rec, attenuation, scattered, seed);		
 	}
 	else if (MAT_METAL == m.Type)
 	{
-		return Metal_Scatter(m, r, rec, attenuation, scattered, seed);
+		Ret = Metal_Scatter(m, r, rec, attenuation, scattered, seed);		
 	}
 	else if (MAT_DIELECTRIC == m.Type)
 	{
-		return Dielectric_Scatter(m, r, rec, attenuation, scattered, seed);
+		Ret = Dielectric_Scatter(m, r, rec, attenuation, scattered, seed);		
 	}
-	return false;
+	return Ret;
 }
 
 
